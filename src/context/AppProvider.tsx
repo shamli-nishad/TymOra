@@ -1,0 +1,105 @@
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import type { TymOraData, DayLog, Activity } from '../types';
+import { storage } from '../lib/storage';
+import { format } from 'date-fns';
+
+interface AppContextType {
+    currentDate: string;
+    setCurrentDate: (date: string) => void;
+    currentDayLog: DayLog | undefined;
+    refreshData: () => void;
+    activeActivity: Activity | null;
+    startActivity: (activity: Activity) => void;
+    stopActivity: () => void;
+}
+
+const AppContext = createContext<AppContextType | undefined>(undefined);
+
+export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [currentDate, setCurrentDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
+    const [data, setData] = useState<TymOraData | null>(null);
+    const [activeActivity, setActiveActivity] = useState<Activity | null>(null);
+
+    const refreshData = () => {
+        const loadedData = storage.getData();
+        setData(loadedData);
+    };
+
+    useEffect(() => {
+        refreshData();
+    }, []);
+
+    const currentDayLog = data?.days.find(d => d.date === currentDate);
+
+    const startActivity = (activity: Activity) => {
+        // In a real app, we'd save this to a "running" state in storage
+        // For MVP, we'll just set it in state. 
+        // If we want to persist running activity across reloads, we'd need more storage logic.
+        setActiveActivity(activity);
+    };
+
+    const stopActivity = () => {
+        if (!activeActivity) return;
+
+        // Calculate duration
+        const now = new Date();
+        const endTime = format(now, 'HH:mm');
+        // Simple duration calc (assuming same day for MVP)
+        // In real app, handle date crossing
+        const start = parseTime(activeActivity.start_time);
+        const end = parseTime(endTime);
+        const duration = (end.getTime() - start.getTime()) / 1000 / 60;
+
+        const completedActivity: Activity = {
+            ...activeActivity,
+            end_time: endTime,
+            duration_minutes: Math.round(duration)
+        };
+
+        // Prepare day log - create if doesn't exist
+        let dayToSave = currentDayLog;
+        if (!dayToSave) {
+            dayToSave = {
+                date: currentDate,
+                day_start_time: activeActivity.start_time,
+                activities: []
+            };
+        }
+
+        // Save to storage
+        const updatedDay = { ...dayToSave, activities: [...dayToSave.activities, completedActivity] };
+        storage.saveDay(updatedDay);
+
+        setActiveActivity(null);
+        refreshData();
+    };
+
+    const parseTime = (timeStr: string) => {
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        const date = new Date();
+        date.setHours(hours, minutes, 0, 0);
+        return date;
+    };
+
+    return (
+        <AppContext.Provider value={{
+            currentDate,
+            setCurrentDate,
+            currentDayLog,
+            refreshData,
+            activeActivity,
+            startActivity,
+            stopActivity
+        }}>
+            {children}
+        </AppContext.Provider>
+    );
+};
+
+export const useApp = () => {
+    const context = useContext(AppContext);
+    if (context === undefined) {
+        throw new Error('useApp must be used within an AppProvider');
+    }
+    return context;
+};
