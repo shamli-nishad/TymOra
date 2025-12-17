@@ -29,6 +29,6 @@ export const CATEGORIES = [
     { id: 'personal', label: 'Personal', icon: 'User', color: 'text-green-500' },
     { id: 'home', label: 'Home', icon: 'Home', color: 'text-orange-500' },
     { id: 'learning', label: 'Learning', icon: 'BookOpen', color: 'text-purple-500' },
-    { id: 'kids', label: 'Kids', icon: 'Baby', color: 'text-pink-500' },
     { id: 'health', label: 'Health', icon: 'Activity', color: 'text-red-500' },
+    { id: 'other', label: 'Other', icon: 'MoreHorizontal', color: 'text-slate-500' },
 ] as const;
