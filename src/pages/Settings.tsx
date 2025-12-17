@@ -58,7 +58,7 @@ const Settings: React.FC = () => {
     const handleReset = () => {
         if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
             localStorage.clear();
-            window.location.reload();
+            window.location.href = '/';
         }
     };
 
