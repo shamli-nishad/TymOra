@@ -10,14 +10,11 @@ const Home: React.FC = () => {
     return (
         <div className="p-6 space-y-8">
             <header>
-                <p className="text-slate-500 text-sm font-medium uppercase tracking-wide">
-                    {format(new Date(currentDate), 'EEEE, MMMM do')}
-                </p>
                 <h1 className="text-3xl font-bold text-slate-900">
-                    Welcom to TymOra
+                    TymOra
                 </h1>
                 <p className="text-slate-500 text-sm font-medium uppercase tracking-wide">
-                    Design better days!
+                    {format(new Date(currentDate), 'EEEE, MMMM do')}
                 </p>
             </header>
 
