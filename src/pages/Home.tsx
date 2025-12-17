@@ -14,8 +14,11 @@ const Home: React.FC = () => {
                     {format(new Date(currentDate), 'EEEE, MMMM do')}
                 </p>
                 <h1 className="text-3xl font-bold text-slate-900">
-                    Hello, Champion
+                    Welcom to TymOra
                 </h1>
+                <p className="text-slate-500 text-sm font-medium uppercase tracking-wide">
+                    Design better days!
+                </p>
             </header>
 
             <section>
