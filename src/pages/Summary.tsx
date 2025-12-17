@@ -38,8 +38,6 @@ const Summary: React.FC = () => {
         return chartData.reduce((acc, curr) => acc + curr.value, 0);
     }, [chartData]);
 
-    const totalHours = (totalMinutes / 60).toFixed(1);
-
     if (!currentDayLog || currentDayLog.activities.length === 0) {
         return (
             <div className="p-6 text-center text-slate-400 mt-10">
@@ -50,10 +48,7 @@ const Summary: React.FC = () => {
 
     return (
         <div className="p-6 space-y-8">
-            <header>
-                <h1 className="text-2xl font-bold text-slate-900">Daily Summary</h1>
-                <p className="text-slate-500">You tracked <span className="font-bold text-slate-800">{totalHours}h</span> today</p>
-            </header>
+
 
             <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                 <h3 className="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wide">Time Distribution</h3>

@@ -64,9 +64,7 @@ const Settings: React.FC = () => {
 
     return (
         <div className="p-6 space-y-8">
-            <header>
-                <h1 className="text-2xl font-bold text-slate-900">Settings</h1>
-            </header>
+
 
             <section className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
                 <div className="p-6 flex items-center gap-4 border-b border-slate-50">

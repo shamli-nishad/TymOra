@@ -28,11 +28,6 @@ const Insights: React.FC = () => {
 
     return (
         <div className="p-6 space-y-6">
-            <header>
-                <h1 className="text-2xl font-bold text-slate-900">Daily Insights</h1>
-                <p className="text-slate-500">AI-driven observations for today</p>
-            </header>
-
             <div className="space-y-4">
                 {insights.map((insight) => {
                     let Icon = Info;
