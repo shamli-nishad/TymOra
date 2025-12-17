@@ -150,7 +150,7 @@ const Settings: React.FC = () => {
             </section>
 
             <div className="text-center text-xs text-slate-300 mt-10">
-                TymOra v0.1.0 MVP
+                TymOra v0.2.0 MVP
             </div>
         </div>
     );

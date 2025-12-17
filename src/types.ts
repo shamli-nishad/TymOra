@@ -46,7 +46,7 @@ export const THEMES: Theme[] = [
     { id: 'blue', label: 'Ocean', primary: 'bg-blue-600', secondary: 'bg-blue-50', text: 'text-blue-600', ring: 'ring-blue-500' },
     { id: 'violet', label: 'Royal', primary: 'bg-violet-600', secondary: 'bg-violet-50', text: 'text-violet-600', ring: 'ring-violet-500' },
     { id: 'emerald', label: 'Nature', primary: 'bg-emerald-600', secondary: 'bg-emerald-50', text: 'text-emerald-600', ring: 'ring-emerald-500' },
-    { id: 'rose', label: 'Passion', primary: 'bg-rose-600', secondary: 'bg-rose-50', text: 'text-rose-600', ring: 'ring-rose-500' },
+    // { id: 'rose', label: 'Passion', primary: 'bg-rose-600', secondary: 'bg-rose-50', text: 'text-rose-600', ring: 'ring-rose-500' },
     // { id: 'amber', label: 'Sunset', primary: 'bg-amber-600', secondary: 'bg-amber-50', text: 'text-amber-600', ring: 'ring-amber-500' }, //replace with a pinkish color
     { id: 'pink', label: 'Sunset', primary: 'bg-pink-600', secondary: 'bg-pink-50', text: 'text-pink-600', ring: 'ring-pink-500' },
 ];

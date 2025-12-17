@@ -18,7 +18,7 @@ const Layout: React.FC = () => {
                         {format(new Date(currentDate), 'EEE, MMM do')}
                     </p>
                 </div>
-                <p className="text-slate-400 text-xs mt-1">Track your activities for <span className={clsx("underline font-medium", theme.text)}>the day</span>, analyze habits, and master your time.</p>
+                <p className="text-slate-400 text-xs mt-1">Track activities for <span className={clsx("underline font-medium", theme.text)}>the day</span>, analyze habits and master time</p>
             </header>
 
             <main className="flex-1 overflow-y-auto pb-20">
