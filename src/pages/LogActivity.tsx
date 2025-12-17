@@ -8,28 +8,59 @@ import { format } from 'date-fns';
 
 const LogActivity: React.FC = () => {
     const navigate = useNavigate();
-    const { startActivity, stopActivity, activeActivity } = useApp();
+    const { startActivity, stopActivity, activeActivity, logManualActivity } = useApp();
 
+    const [mode, setMode] = useState<'timer' | 'manual'>('timer');
     const [selectedCategory, setSelectedCategory] = useState<string>(CATEGORIES[0].id);
     const [activityName, setActivityName] = useState('');
     const [notes, setNotes] = useState('');
+    const [startTime, setStartTime] = useState(format(new Date(), 'HH:mm'));
+    const [endTime, setEndTime] = useState(format(new Date(), 'HH:mm'));
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (activeActivity) {
-            stopActivity();
-        }
+        const categoryLabel = CATEGORIES.find(c => c.id === selectedCategory)?.label || 'Other';
 
-        startActivity({
-            start_time: format(new Date(), 'HH:mm'),
-            category: CATEGORIES.find(c => c.id === selectedCategory)?.label || 'Other',
-            activity: activityName || 'Untitled Activity',
-            notes: notes,
-            logged_via: 'timer',
-            energy_level: 'medium', // Default
-            mood: 'focused' // Default
-        });
+        if (mode === 'timer') {
+            if (activeActivity) {
+                stopActivity();
+            }
+
+            startActivity({
+                start_time: format(new Date(), 'HH:mm'),
+                category: categoryLabel,
+                activity: activityName || 'Untitled Activity',
+                notes: notes,
+                logged_via: 'timer',
+                energy_level: 'medium',
+                mood: 'focused'
+            });
+        } else {
+            // Manual entry
+            const start = new Date();
+            const [startH, startM] = startTime.split(':').map(Number);
+            start.setHours(startH, startM, 0, 0);
+
+            const end = new Date();
+            const [endH, endM] = endTime.split(':').map(Number);
+            end.setHours(endH, endM, 0, 0);
+
+            let duration = (end.getTime() - start.getTime()) / 1000 / 60;
+            if (duration < 0) duration += 24 * 60; // Handle overnight
+
+            logManualActivity({
+                start_time: startTime,
+                end_time: endTime,
+                duration_minutes: Math.round(duration),
+                category: categoryLabel,
+                activity: activityName || 'Untitled Activity',
+                notes: notes,
+                logged_via: 'manual',
+                energy_level: 'medium',
+                mood: 'focused'
+            });
+        }
 
         navigate('/');
     };
@@ -37,6 +68,29 @@ const LogActivity: React.FC = () => {
     return (
         <div className="p-6 pb-24">
             <h1 className="text-2xl font-bold text-slate-900 mb-6">Log Activity</h1>
+
+            <div className="flex bg-slate-100 p-1 rounded-xl mb-6">
+                <button
+                    type="button"
+                    onClick={() => setMode('timer')}
+                    className={clsx(
+                        "flex-1 py-2 rounded-lg text-sm font-medium transition-all",
+                        mode === 'timer' ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                    )}
+                >
+                    Timer
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setMode('manual')}
+                    className={clsx(
+                        "flex-1 py-2 rounded-lg text-sm font-medium transition-all",
+                        mode === 'manual' ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                    )}
+                >
+                    Manual Entry
+                </button>
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 <section>
@@ -83,6 +137,31 @@ const LogActivity: React.FC = () => {
                     />
                 </section>
 
+                {mode === 'manual' && (
+                    <section className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Start Time</label>
+                            <input
+                                type="time"
+                                value={startTime}
+                                onChange={(e) => setStartTime(e.target.value)}
+                                className="w-full p-4 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">End Time</label>
+                            <input
+                                type="time"
+                                value={endTime}
+                                onChange={(e) => setEndTime(e.target.value)}
+                                className="w-full p-4 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                required
+                            />
+                        </div>
+                    </section>
+                )}
+
                 <section>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Notes (Optional)</label>
                     <textarea
@@ -97,7 +176,7 @@ const LogActivity: React.FC = () => {
                     type="submit"
                     className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all"
                 >
-                    Start Activity
+                    {mode === 'timer' ? 'Start Activity' : 'Save Activity'}
                 </button>
             </form>
         </div>

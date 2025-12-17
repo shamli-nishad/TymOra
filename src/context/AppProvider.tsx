@@ -11,6 +11,7 @@ interface AppContextType {
     activeActivity: Activity | null;
     startActivity: (activity: Activity) => void;
     stopActivity: () => void;
+    logManualActivity: (activity: Activity) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -32,10 +33,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const currentDayLog = data?.days.find(d => d.date === currentDate);
 
     const startActivity = (activity: Activity) => {
-        // In a real app, we'd save this to a "running" state in storage
-        // For MVP, we'll just set it in state. 
-        // If we want to persist running activity across reloads, we'd need more storage logic.
         setActiveActivity(activity);
+    };
+
+    const logManualActivity = (activity: Activity) => {
+        // Prepare day log - create if doesn't exist
+        let dayToSave = currentDayLog;
+        if (!dayToSave) {
+            dayToSave = {
+                date: currentDate,
+                day_start_time: activity.start_time,
+                activities: []
+            };
+        }
+
+        // Save to storage
+        const updatedDay = { ...dayToSave, activities: [...dayToSave.activities, activity] };
+        storage.saveDay(updatedDay);
+        refreshData();
     };
 
     const stopActivity = () => {
@@ -89,7 +104,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             refreshData,
             activeActivity,
             startActivity,
-            stopActivity
+            stopActivity,
+            logManualActivity
         }}>
             {children}
         </AppContext.Provider>
