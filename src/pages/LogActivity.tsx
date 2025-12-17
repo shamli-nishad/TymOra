@@ -9,7 +9,7 @@ import { format } from 'date-fns';
 const LogActivity: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
-    const { startActivity, stopActivity, activeActivity, logManualActivity, updateActivity, deleteActivity, currentDayLog } = useApp();
+    const { startActivity, stopActivity, activeActivity, logManualActivity, updateActivity, deleteActivity, currentDayLog, theme } = useApp();
 
     const [mode, setMode] = useState<'timer' | 'manual'>('timer');
     const [selectedCategory, setSelectedCategory] = useState<string>(CATEGORIES[0].id);
@@ -117,7 +117,7 @@ const LogActivity: React.FC = () => {
                         onClick={() => setMode('timer')}
                         className={clsx(
                             "flex-1 py-2 rounded-lg text-sm font-medium transition-all",
-                            mode === 'timer' ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                            mode === 'timer' ? clsx("shadow-sm text-white", theme.primary) : "text-slate-500 hover:text-slate-700"
                         )}
                     >
                         Timer
@@ -127,7 +127,7 @@ const LogActivity: React.FC = () => {
                         onClick={() => setMode('manual')}
                         className={clsx(
                             "flex-1 py-2 rounded-lg text-sm font-medium transition-all",
-                            mode === 'manual' ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                            mode === 'manual' ? clsx("shadow-sm text-white", theme.primary) : "text-slate-500 hover:text-slate-700"
                         )}
                     >
                         Manual Entry
@@ -175,7 +175,10 @@ const LogActivity: React.FC = () => {
                         value={activityName}
                         onChange={(e) => setActivityName(e.target.value)}
                         placeholder="What are you doing?"
-                        className="w-full p-4 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        className={clsx(
+                            "w-full p-4 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 bg-white",
+                            theme.ring
+                        )}
                         required
                     />
                 </section>
@@ -188,7 +191,10 @@ const LogActivity: React.FC = () => {
                                 type="time"
                                 value={startTime}
                                 onChange={(e) => setStartTime(e.target.value)}
-                                className="w-full p-4 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                className={clsx(
+                                    "w-full p-4 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 bg-white",
+                                    theme.ring
+                                )}
                                 required
                             />
                         </div>
@@ -198,7 +204,10 @@ const LogActivity: React.FC = () => {
                                 type="time"
                                 value={endTime}
                                 onChange={(e) => setEndTime(e.target.value)}
-                                className="w-full p-4 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                className={clsx(
+                                    "w-full p-4 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 bg-white",
+                                    theme.ring
+                                )}
                                 required
                             />
                         </div>
@@ -211,7 +220,10 @@ const LogActivity: React.FC = () => {
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         placeholder="Add details..."
-                        className="w-full p-4 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white h-24 resize-none"
+                        className={clsx(
+                            "w-full p-4 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 bg-white h-24 resize-none",
+                            theme.ring
+                        )}
                     />
                 </section>
 
@@ -232,7 +244,11 @@ const LogActivity: React.FC = () => {
                     )}
                     <button
                         type="submit"
-                        className="flex-[2] bg-blue-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all"
+                        className={clsx(
+                            "flex-[2] text-white py-4 rounded-xl font-bold text-lg shadow-lg transition-all",
+                            theme.primary,
+                            "shadow-slate-200 hover:opacity-90"
+                        )}
                     >
                         {id ? 'Update Activity' : (mode === 'timer' ? 'Start Activity' : 'Save Activity')}
                     </button>

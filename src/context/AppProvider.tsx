@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { TymOraData, DayLog, Activity } from '../types';
+import type { TymOraData, DayLog, Activity, Theme } from '../types';
+import { THEMES } from '../types';
 import { storage } from '../lib/storage';
 import { format } from 'date-fns';
 
@@ -14,6 +15,8 @@ interface AppContextType {
     logManualActivity: (activity: Omit<Activity, 'id'>) => void;
     updateActivity: (activity: Activity) => void;
     deleteActivity: (id: string) => void;
+    theme: Theme;
+    setTheme: (theme: Theme) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -22,6 +25,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const [currentDate, setCurrentDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
     const [data, setData] = useState<TymOraData | null>(null);
     const [activeActivity, setActiveActivity] = useState<Activity | null>(null);
+    const [theme, setThemeState] = useState<Theme>(THEMES[0]);
+
+    // Load theme from local storage
+    useEffect(() => {
+        const savedThemeId = localStorage.getItem('tymora_theme');
+        if (savedThemeId) {
+            const foundTheme = THEMES.find(t => t.id === savedThemeId);
+            if (foundTheme) setThemeState(foundTheme);
+        }
+    }, []);
+
+    const setTheme = (newTheme: Theme) => {
+        setThemeState(newTheme);
+        localStorage.setItem('tymora_theme', newTheme.id);
+    };
 
     const refreshData = () => {
         const loadedData = storage.getData();
@@ -133,7 +151,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             stopActivity,
             logManualActivity,
             updateActivity,
-            deleteActivity
+            deleteActivity,
+            theme,
+            setTheme
         }}>
             {children}
         </AppContext.Provider>

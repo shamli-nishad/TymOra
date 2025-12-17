@@ -2,9 +2,11 @@ import React, { useRef } from 'react';
 import { Download, Trash2, User, Upload } from 'lucide-react';
 import { storage } from '../lib/storage';
 import { useApp } from '../context/AppProvider';
+import { THEMES } from '../types';
+import clsx from 'clsx';
 
 const Settings: React.FC = () => {
-    const { refreshData } = useApp();
+    const { refreshData, theme, setTheme } = useApp();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleExport = () => {
@@ -74,6 +76,30 @@ const Settings: React.FC = () => {
                     <div>
                         <h3 className="font-bold text-slate-800">Local User</h3>
                         <p className="text-xs text-slate-500">Data stored locally on device</p>
+                    </div>
+                </div>
+            </section>
+
+            <section className="space-y-3">
+                <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wide px-2">Appearance</h3>
+                <div className="bg-white p-4 rounded-xl border border-slate-200">
+                    <h4 className="font-medium text-slate-800 mb-3">App Theme</h4>
+                    <div className="flex gap-3 overflow-x-auto pb-2">
+                        {THEMES.map((t) => (
+                            <button
+                                key={t.id}
+                                onClick={() => setTheme(t)}
+                                className={clsx(
+                                    "flex flex-col items-center gap-2 p-2 rounded-lg transition-all min-w-[60px]",
+                                    theme.id === t.id ? "bg-slate-50 ring-2 ring-slate-200" : "hover:bg-slate-50"
+                                )}
+                            >
+                                <div className={clsx("w-8 h-8 rounded-full shadow-sm", t.primary)} />
+                                <span className={clsx("text-xs font-medium", theme.id === t.id ? "text-slate-900" : "text-slate-500")}>
+                                    {t.label}
+                                </span>
+                            </button>
+                        ))}
                     </div>
                 </div>
             </section>

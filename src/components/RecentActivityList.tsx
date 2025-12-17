@@ -6,7 +6,7 @@ import * as Icons from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const RecentActivityList: React.FC = () => {
-    const { currentDayLog } = useApp();
+    const { currentDayLog, theme } = useApp();
 
     if (!currentDayLog || currentDayLog.activities.length === 0) {
         return (
@@ -42,7 +42,7 @@ const RecentActivityList: React.FC = () => {
                         </div>
                         <div className="text-right flex items-center gap-3">
                             {act.mood && <span className="text-lg">{moodEmoji(act.mood)}</span>}
-                            <Link to={`/edit/${act.id}`} className="p-1 text-slate-400 hover:text-blue-600">
+                            <Link to={`/edit/${act.id}`} className={clsx("p-1 text-slate-400 hover:opacity-80", theme.text)}>
                                 <Icons.Edit2 size={14} />
                             </Link>
                         </div>
