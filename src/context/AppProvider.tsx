@@ -9,9 +9,11 @@ interface AppContextType {
     currentDayLog: DayLog | undefined;
     refreshData: () => void;
     activeActivity: Activity | null;
-    startActivity: (activity: Activity) => void;
+    startActivity: (activity: Omit<Activity, 'id'>) => void;
     stopActivity: () => void;
-    logManualActivity: (activity: Activity) => void;
+    logManualActivity: (activity: Omit<Activity, 'id'>) => void;
+    updateActivity: (activity: Activity) => void;
+    deleteActivity: (id: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -32,11 +34,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     const currentDayLog = data?.days.find(d => d.date === currentDate);
 
-    const startActivity = (activity: Activity) => {
-        setActiveActivity(activity);
+    const startActivity = (activity: Omit<Activity, 'id'>) => {
+        const newActivity: Activity = { ...activity, id: crypto.randomUUID() };
+        setActiveActivity(newActivity);
     };
 
-    const logManualActivity = (activity: Activity) => {
+    const logManualActivity = (activity: Omit<Activity, 'id'>) => {
         // Prepare day log - create if doesn't exist
         let dayToSave = currentDayLog;
         if (!dayToSave) {
@@ -47,8 +50,31 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             };
         }
 
+        const newActivity: Activity = { ...activity, id: crypto.randomUUID() };
+
         // Save to storage
-        const updatedDay = { ...dayToSave, activities: [...dayToSave.activities, activity] };
+        const updatedDay = { ...dayToSave, activities: [...dayToSave.activities, newActivity] };
+        storage.saveDay(updatedDay);
+        refreshData();
+    };
+
+    const updateActivity = (updatedActivity: Activity) => {
+        if (!currentDayLog) return;
+
+        const updatedActivities = currentDayLog.activities.map(act =>
+            act.id === updatedActivity.id ? updatedActivity : act
+        );
+
+        const updatedDay = { ...currentDayLog, activities: updatedActivities };
+        storage.saveDay(updatedDay);
+        refreshData();
+    };
+
+    const deleteActivity = (id: string) => {
+        if (!currentDayLog) return;
+
+        const updatedActivities = currentDayLog.activities.filter(act => act.id !== id);
+        const updatedDay = { ...currentDayLog, activities: updatedActivities };
         storage.saveDay(updatedDay);
         refreshData();
     };
@@ -105,7 +131,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             activeActivity,
             startActivity,
             stopActivity,
-            logManualActivity
+            logManualActivity,
+            updateActivity,
+            deleteActivity
         }}>
             {children}
         </AppContext.Provider>

@@ -3,6 +3,8 @@ import { useApp } from '../context/AppProvider';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { CATEGORIES } from '../types';
 import clsx from 'clsx';
+import { Link } from 'react-router-dom';
+import { Edit2 } from 'lucide-react';
 
 const Summary: React.FC = () => {
     const { currentDayLog } = useApp();
@@ -97,7 +99,14 @@ const Summary: React.FC = () => {
                             <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
                                 <div className="flex justify-between items-start">
                                     <span className="text-xs font-bold text-slate-400 uppercase">{act.start_time}</span>
-                                    <span className="text-xs font-medium text-slate-400">{act.duration_minutes}m</span>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-sm font-bold text-slate-900">
+                                            {act.duration_minutes}m
+                                        </span>
+                                        <Link to={`/edit/${act.id}`} className="text-slate-400 hover:text-blue-600">
+                                            <Edit2 size={14} />
+                                        </Link>
+                                    </div>
                                 </div>
                                 <h4 className="font-medium text-slate-800 mt-1">{act.activity}</h4>
                                 <span className="text-xs text-slate-500 bg-slate-50 px-2 py-1 rounded-md mt-2 inline-block">

@@ -1,4 +1,5 @@
 export interface Activity {
+    id: string;
     start_time: string; // HH:mm
     end_time?: string; // HH:mm, optional if currently running
     duration_minutes?: number;

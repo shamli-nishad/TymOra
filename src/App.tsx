@@ -12,7 +12,8 @@ const App: React.FC = () => {
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
-        <Route path="log" element={<LogActivity />} />
+        <Route path="/log" element={<LogActivity />} />
+        <Route path="/edit/:id" element={<LogActivity />} />
         <Route path="summary" element={<Summary />} />
         <Route path="insights" element={<Insights />} />
         <Route path="settings" element={<Settings />} />

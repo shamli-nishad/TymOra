@@ -3,6 +3,7 @@ import { useApp } from '../context/AppProvider';
 import { CATEGORIES } from '../types';
 import clsx from 'clsx';
 import * as Icons from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const RecentActivityList: React.FC = () => {
     const { currentDayLog } = useApp();
@@ -39,8 +40,11 @@ const RecentActivityList: React.FC = () => {
                                 <span>{act.duration_minutes}m</span>
                             </div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-right flex items-center gap-3">
                             {act.mood && <span className="text-lg">{moodEmoji(act.mood)}</span>}
+                            <Link to={`/edit/${act.id}`} className="p-1 text-slate-400 hover:text-blue-600">
+                                <Icons.Edit2 size={14} />
+                            </Link>
                         </div>
                     </div>
                 );

@@ -5,14 +5,38 @@ const STORAGE_KEY = 'tymora_data';
 
 export const storage = {
     getData: (): TymOraData => {
-        const data = localStorage.getItem(STORAGE_KEY);
-        if (!data) {
+        const dataStr = localStorage.getItem(STORAGE_KEY);
+        if (!dataStr) {
             // Seed with sample data if empty
             const initialData = sampleData as unknown as TymOraData;
+            // Ensure sample data has IDs
+            initialData.days.forEach(day => {
+                day.activities.forEach(act => {
+                    if (!act.id) act.id = crypto.randomUUID();
+                });
+            });
             localStorage.setItem(STORAGE_KEY, JSON.stringify(initialData));
             return initialData;
         }
-        return JSON.parse(data);
+
+        const data = JSON.parse(dataStr) as TymOraData;
+
+        // Migration: Ensure all activities have IDs
+        let hasChanges = false;
+        data.days.forEach(day => {
+            day.activities.forEach(act => {
+                if (!act.id) {
+                    act.id = crypto.randomUUID();
+                    hasChanges = true;
+                }
+            });
+        });
+
+        if (hasChanges) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        return data;
     },
 
     saveData: (data: TymOraData) => {
