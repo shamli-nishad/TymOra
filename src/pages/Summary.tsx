@@ -162,7 +162,7 @@ const Summary: React.FC = () => {
                                         <div className="flex justify-between items-start">
                                             <div className="flex flex-col">
                                                 <span className="text-xs font-bold text-slate-400 uppercase">
-                                                    {(act as any).date ? `${(act as any).date} ` : ''}{act.start_time}
+                                                    {(act as any).date ? `${(act as any).date} ` : ''}{act.start_time} - {act.end_time}
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-3">
