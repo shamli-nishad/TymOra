@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useApp } from '../context/AppProvider';
-import { Play, Square, Clock } from 'lucide-react';
+import { Play, Square } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { CATEGORIES } from '../types';
 import clsx from 'clsx';
