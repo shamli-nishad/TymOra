@@ -12,11 +12,14 @@ interface AppContextType {
     activeActivity: Activity | null;
     startActivity: (activity: Omit<Activity, 'id'>) => void;
     stopActivity: () => void;
-    logManualActivity: (activity: Omit<Activity, 'id'>) => void;
-    updateActivity: (activity: Activity) => void;
+    logManualActivity: (activity: Omit<Activity, 'id'>, date?: string) => void;
+    updateActivity: (activity: Activity, date?: string) => void;
     deleteActivity: (id: string) => void;
     theme: Theme;
     setTheme: (theme: Theme) => void;
+    historyRetentionDays: number;
+    setHistoryRetentionDays: (days: number) => void;
+    data: TymOraData | null;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -26,6 +29,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const [data, setData] = useState<TymOraData | null>(null);
     const [activeActivity, setActiveActivity] = useState<Activity | null>(null);
     const [theme, setThemeState] = useState<Theme>(THEMES[0]);
+    const [historyRetentionDays, setHistoryRetentionDaysState] = useState<number>(2);
 
     // Load theme from local storage
     useEffect(() => {
@@ -44,9 +48,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const refreshData = () => {
         const loadedData = storage.getData();
         setData(loadedData);
+        setHistoryRetentionDaysState(loadedData.historyRetentionDays || 2);
+    };
+
+    const setHistoryRetentionDays = (days: number) => {
+        const newData = storage.getData();
+        newData.historyRetentionDays = days;
+        storage.saveData(newData);
+        setHistoryRetentionDaysState(days);
+
+        // Trigger cleanup immediately when setting changes
+        storage.cleanupOldData();
+        refreshData();
     };
 
     useEffect(() => {
+        storage.cleanupOldData();
         refreshData();
     }, []);
 
@@ -57,12 +74,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setActiveActivity(newActivity);
     };
 
-    const logManualActivity = (activity: Omit<Activity, 'id'>) => {
-        // Prepare day log - create if doesn't exist
-        let dayToSave = currentDayLog;
+    const logManualActivity = (activity: Omit<Activity, 'id'>, date?: string) => {
+        const targetDate = date || currentDate;
+
+        // Get fresh data to ensure we have the latest state
+        const currentData = storage.getData();
+        let dayToSave = currentData.days.find(d => d.date === targetDate);
+
         if (!dayToSave) {
             dayToSave = {
-                date: currentDate,
+                date: targetDate,
                 day_start_time: activity.start_time,
                 activities: []
             };
@@ -76,25 +97,77 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         refreshData();
     };
 
-    const updateActivity = (updatedActivity: Activity) => {
-        if (!currentDayLog) return;
+    const updateActivity = (updatedActivity: Activity, newDate?: string) => {
+        const currentData = storage.getData();
 
-        const updatedActivities = currentDayLog.activities.map(act =>
-            act.id === updatedActivity.id ? updatedActivity : act
-        );
+        // Find the activity's current location
+        let originalDayIndex = -1;
+        let originalActivityIndex = -1;
 
-        const updatedDay = { ...currentDayLog, activities: updatedActivities };
-        storage.saveDay(updatedDay);
+        for (let i = 0; i < currentData.days.length; i++) {
+            const idx = currentData.days[i].activities.findIndex(a => a.id === updatedActivity.id);
+            if (idx !== -1) {
+                originalDayIndex = i;
+                originalActivityIndex = idx;
+                break;
+            }
+        }
+
+        if (originalDayIndex === -1) return; // Activity not found
+
+        const originalDay = currentData.days[originalDayIndex];
+        const targetDate = newDate || originalDay.date;
+
+        if (targetDate === originalDay.date) {
+            // Same day update
+            originalDay.activities[originalActivityIndex] = updatedActivity;
+            storage.saveDay(originalDay);
+        } else {
+            // Move to different day
+            // 1. Remove from old day
+            originalDay.activities.splice(originalActivityIndex, 1);
+            storage.saveDay(originalDay);
+
+            // 2. Add to new day
+            let targetDay = currentData.days.find(d => d.date === targetDate);
+            if (!targetDay) {
+                targetDay = {
+                    date: targetDate,
+                    day_start_time: updatedActivity.start_time,
+                    activities: []
+                };
+                // We need to push this new day to data if we want to save it via saveDay properly 
+                // but saveDay handles "push if not exists" logic internally if we pass the object.
+            }
+
+            // We need to be careful not to mutate the 'targetDay' reference if it came from 'currentData' 
+            // without cloning if we were using React state, but here we are modifying the object 
+            // and passing it to storage.saveDay which re-reads or updates.
+            // Actually storage.saveDay reads fresh data. Let's use storage.saveDay logic.
+
+            const updatedTargetDay = {
+                ...targetDay,
+                activities: [...targetDay.activities, updatedActivity]
+            };
+            storage.saveDay(updatedTargetDay);
+        }
+
         refreshData();
     };
 
     const deleteActivity = (id: string) => {
-        if (!currentDayLog) return;
+        const currentData = storage.getData();
 
-        const updatedActivities = currentDayLog.activities.filter(act => act.id !== id);
-        const updatedDay = { ...currentDayLog, activities: updatedActivities };
-        storage.saveDay(updatedDay);
-        refreshData();
+        // Find and remove
+        for (const day of currentData.days) {
+            const idx = day.activities.findIndex(a => a.id === id);
+            if (idx !== -1) {
+                day.activities.splice(idx, 1);
+                storage.saveDay(day);
+                refreshData();
+                return;
+            }
+        }
     };
 
     const stopActivity = () => {
@@ -153,7 +226,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             updateActivity,
             deleteActivity,
             theme,
-            setTheme
+            setTheme,
+            historyRetentionDays,
+            setHistoryRetentionDays,
+            data
         }}>
             {children}
         </AppContext.Provider>

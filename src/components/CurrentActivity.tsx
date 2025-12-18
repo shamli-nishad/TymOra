@@ -33,9 +33,9 @@ const CurrentActivity: React.FC = () => {
     if (!activeActivity) {
         return (
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col items-center text-center">
-                <div className="bg-slate-100 p-4 rounded-full mb-4">
+                {/* <div className="bg-slate-100 p-4 rounded-full mb-4">
                     <Clock size={32} className="text-slate-400" />
-                </div>
+                </div> */}
                 <h3 className="text-lg font-semibold text-slate-800 mb-1">Ready to focus?</h3>
                 <p className="text-slate-500 text-sm mb-6">Start tracking your activity to get insights.</p>
                 <Link to="/log" className={clsx("text-white px-6 py-3 rounded-xl font-medium shadow-lg transition-all flex items-center gap-2", theme.primary, "shadow-slate-200 hover:opacity-90")}>

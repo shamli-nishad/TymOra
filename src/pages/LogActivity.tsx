@@ -4,12 +4,12 @@ import { useApp } from '../context/AppProvider';
 import { CATEGORIES } from '../types';
 import clsx from 'clsx';
 import * as Icons from 'lucide-react';
-import { format } from 'date-fns';
+import { format, subDays } from 'date-fns';
 
 const LogActivity: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
-    const { startActivity, stopActivity, activeActivity, logManualActivity, updateActivity, deleteActivity, currentDayLog, theme } = useApp();
+    const { startActivity, stopActivity, activeActivity, logManualActivity, updateActivity, deleteActivity, data, theme, historyRetentionDays } = useApp();
 
     const [mode, setMode] = useState<'timer' | 'manual'>('timer');
     const [selectedCategory, setSelectedCategory] = useState<string>(CATEGORIES[0].id);
@@ -17,21 +17,34 @@ const LogActivity: React.FC = () => {
     const [notes, setNotes] = useState('');
     const [startTime, setStartTime] = useState(format(new Date(), 'HH:mm'));
     const [endTime, setEndTime] = useState(format(new Date(), 'HH:mm'));
+    const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
 
     // Load activity data if editing
     useEffect(() => {
-        if (id && currentDayLog) {
-            const activityToEdit = currentDayLog.activities.find(a => a.id === id);
-            if (activityToEdit) {
+        if (id && data) {
+            // Find activity in all days
+            let foundActivity;
+            let foundDate;
+            for (const day of data.days) {
+                const act = day.activities.find(a => a.id === id);
+                if (act) {
+                    foundActivity = act;
+                    foundDate = day.date;
+                    break;
+                }
+            }
+
+            if (foundActivity) {
                 setMode('manual'); // Editing is always manual style
-                setSelectedCategory(CATEGORIES.find(c => c.label === activityToEdit.category)?.id || CATEGORIES[0].id);
-                setActivityName(activityToEdit.activity);
-                setNotes(activityToEdit.notes || '');
-                setStartTime(activityToEdit.start_time);
-                setEndTime(activityToEdit.end_time || format(new Date(), 'HH:mm'));
+                setSelectedCategory(CATEGORIES.find(c => c.label === foundActivity.category)?.id || CATEGORIES[0].id);
+                setActivityName(foundActivity.activity);
+                setNotes(foundActivity.notes || '');
+                setStartTime(foundActivity.start_time);
+                setEndTime(foundActivity.end_time || format(new Date(), 'HH:mm'));
+                if (foundDate) setDate(foundDate);
             }
         }
-    }, [id, currentDayLog]);
+    }, [id, data]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -59,10 +72,10 @@ const LogActivity: React.FC = () => {
                 category: categoryLabel,
                 activity: activityName || 'Untitled Activity',
                 notes: notes,
-                logged_via: 'manual', // Keep original? For now override or keep simple
+                logged_via: 'manual',
                 energy_level: 'medium',
                 mood: 'focused'
-            });
+            }, date);
         } else if (mode === 'timer') {
             if (activeActivity) {
                 stopActivity();
@@ -100,11 +113,14 @@ const LogActivity: React.FC = () => {
                 logged_via: 'manual',
                 energy_level: 'medium',
                 mood: 'focused'
-            });
+            }, date);
         }
 
         navigate('/');
     };
+
+    const maxDate = format(new Date(), 'yyyy-MM-dd');
+    const minDate = format(subDays(new Date(), historyRetentionDays), 'yyyy-MM-dd');
 
     return (
         <div className="p-6 pb-24">
@@ -136,6 +152,7 @@ const LogActivity: React.FC = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-8">
+
                 <section>
                     <label className="block text-sm font-medium text-slate-700 mb-3">Category</label>
                     <div className="grid grid-cols-3 gap-3">
@@ -184,6 +201,25 @@ const LogActivity: React.FC = () => {
                 </section>
 
                 {(mode === 'manual' || id) && (
+                    <section>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Date</label>
+                        <input
+                            type="date"
+                            value={date}
+                            max={maxDate}
+                            min={minDate}
+                            onChange={(e) => setDate(e.target.value)}
+                            className={clsx(
+                                "w-full p-4 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 bg-white",
+                                theme.ring
+                            )}
+                            required
+                        />
+                        <p className="text-xs text-slate-400 mt-1">You can log activities for the last {historyRetentionDays} days.</p>
+                    </section>
+                )}
+
+                {(mode === 'manual' || id) && (
                     <section className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-2">Start Time</label>
@@ -229,18 +265,27 @@ const LogActivity: React.FC = () => {
 
                 <div className="flex gap-4">
                     {id && (
-                        <button
-                            type="button"
-                            onClick={() => {
-                                if (confirm('Are you sure you want to delete this activity?')) {
-                                    deleteActivity(id);
-                                    navigate('/');
-                                }
-                            }}
-                            className="flex-1 bg-red-50 text-red-600 py-4 rounded-xl font-bold text-lg border border-red-100 hover:bg-red-100 transition-all"
-                        >
-                            Delete
-                        </button>
+                        <>
+                            <button
+                                type="button"
+                                onClick={() => navigate('/')}
+                                className="flex-1 bg-slate-100 text-slate-600 py-4 rounded-xl font-bold text-lg border border-slate-200 hover:bg-slate-200 transition-all"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (confirm('Are you sure you want to delete this activity?')) {
+                                        deleteActivity(id);
+                                        navigate('/');
+                                    }
+                                }}
+                                className="flex-1 bg-red-50 text-red-600 py-4 rounded-xl font-bold text-lg border border-red-100 hover:bg-red-100 transition-all"
+                            >
+                                Delete
+                            </button>
+                        </>
                     )}
                     <button
                         type="submit"

@@ -7,7 +7,7 @@ import { APP_VERSION } from '../config/version';
 import clsx from 'clsx';
 
 const Settings: React.FC = () => {
-    const { refreshData, theme, setTheme } = useApp();
+    const { refreshData, theme, setTheme, historyRetentionDays, setHistoryRetentionDays } = useApp();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleExport = () => {
@@ -101,6 +101,34 @@ const Settings: React.FC = () => {
                                 </span>
                             </button>
                         ))}
+                    </div>
+                </div>
+            </section>
+
+            <section className="space-y-3">
+                <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wide px-2">History</h3>
+                <div className="bg-white p-4 rounded-xl border border-slate-200">
+                    <div className="flex justify-between items-center mb-2">
+                        <h4 className="font-medium text-slate-800">History Retention</h4>
+                        <span className="text-sm font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
+                            {historyRetentionDays} Days
+                        </span>
+                    </div>
+                    <p className="text-xs text-slate-500 mb-4">
+                        Automatically delete activity data older than {historyRetentionDays} days.
+                    </p>
+                    <input
+                        type="range"
+                        min="1"
+                        max="7"
+                        step="1"
+                        value={historyRetentionDays}
+                        onChange={(e) => setHistoryRetentionDays(Number(e.target.value))}
+                        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                    />
+                    <div className="flex justify-between text-xs text-slate-400 mt-2">
+                        <span>1 Day</span>
+                        <span>7 Days</span>
                     </div>
                 </div>
             </section>

@@ -21,6 +21,7 @@ export interface DayLog {
 
 export interface TymOraData {
     timezone: string;
+    historyRetentionDays: number; // Default 2, max 7
     days: DayLog[];
 }
 
