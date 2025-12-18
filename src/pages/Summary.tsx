@@ -103,7 +103,7 @@ const Summary: React.FC = () => {
                         activeTab === 'history' ? clsx("shadow-sm text-white", theme.primary) : "text-slate-500 hover:text-slate-700"
                     )}
                 >
-                    History ({data.historyRetentionDays || 2} Days)
+                    History (Last {data.historyRetentionDays || 2} Days)
                 </button>
             </div>
 
