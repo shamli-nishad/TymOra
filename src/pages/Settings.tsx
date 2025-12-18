@@ -3,6 +3,7 @@ import { Download, Trash2, User, Upload } from 'lucide-react';
 import { storage } from '../lib/storage';
 import { useApp } from '../context/AppProvider';
 import { THEMES } from '../types';
+import { APP_VERSION } from '../config/version';
 import clsx from 'clsx';
 
 const Settings: React.FC = () => {
@@ -150,7 +151,8 @@ const Settings: React.FC = () => {
             </section>
 
             <div className="text-center text-xs text-slate-300 mt-10">
-                TymOra v0.2.0 MVP
+                TymOra v{APP_VERSION} MVP
+                {/* TymOra v0.2.0 MVP */}
             </div>
         </div>
     );
