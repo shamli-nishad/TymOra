@@ -1,73 +1,85 @@
-# React + TypeScript + Vite
+# TymOra - Personal Activity Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+TymOra is a modern, privacy-focused activity tracking and time management application designed to help you understand and optimize how you spend your time. With a sleek interface and intuitive controls, TymOra makes it easy to log your daily routines and gain valuable insights into your productivity and habits.
 
-Currently, two official plugins are available:
+## 🚀 Key Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Real-time Tracking:** Start a timer for your current activity with a single click.
+- **Manual Logging:** Easily log past activities or edit existing ones with a user-friendly form.
+- **Visual Analytics:** Interactive pie charts provide a clear breakdown of your time distribution across categories like Work, Personal, Home, Learning, and more.
+- **Timeline & History:** View your day at a glance with a chronological timeline, or explore your past logs in the History tab.
+- **Configurable Retention:** Keep your data lean with a customizable history retention policy (1-7 days).
+- **Personalized Themes:** Choose from multiple premium color themes (Ocean, Forest, Sunset, etc.) to match your style.
+- **Privacy First:** All your data is stored locally in your browser's `localStorage`. No accounts, no tracking, no data leaves your device.
 
-## React Compiler
+## 🛠️ Technical Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+TymOra is built with a modern, high-performance tech stack:
 
-## Expanding the ESLint configuration
+- **Framework:** [React 19](https://react.dev/) with [TypeScript](https://www.typescriptlang.org/) for robust, type-safe development.
+- **Build Tool:** [Vite](https://vitejs.dev/) for lightning-fast development and optimized production builds.
+- **Styling:** [Tailwind CSS 4](https://tailwindcss.com/) for a modern, responsive, and utility-first design system.
+- **Routing:** [React Router 7](https://reactrouter.com/) for seamless client-side navigation.
+- **Data Visualization:** [Recharts](https://recharts.org/) for beautiful, responsive charts.
+- **Icons:** [Lucide React](https://lucide.dev/) for a consistent and crisp icon set.
+- **Date Utilities:** [date-fns](https://date-fns.org/) for reliable date and time manipulation.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 💻 Getting Started
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Prerequisites
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- [Node.js](https://nodejs.org/) (v18 or higher recommended)
+- [npm](https://www.npmjs.com/)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Installation
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd TymOra
+   ```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Running the App
+
+- **Development Mode:**
+  Start the development server with Hot Module Replacement (HMR):
+  ```bash
+  npm run dev
+  ```
+  The app will be available at `http://localhost:5173`.
+
+- **Production Build:**
+  Create an optimized production build in the `dist` folder:
+  ```bash
+  npm run build
+  ```
+
+- **Preview Production Build:**
+  Preview the production build locally:
+  ```bash
+  npm run preview
+  ```
+
+- **Linting:**
+  Run ESLint to check for code quality and style issues:
+  ```bash
+  npm run lint
+  ```
+
+## 📂 Project Structure
+
+- `src/components`: Reusable UI components (Timer, Activity Lists, Charts).
+- `src/context`: React Context for global state management (Theme, Data, Active Activity).
+- `src/lib`: Utility functions and storage logic.
+- `src/pages`: Main application views (Home, Log Activity, Summary, Settings).
+- `src/types`: TypeScript interfaces and constants.
+- `src/styles`: Global styles and Tailwind configuration.
+
+---
+
+Built with ❤️ for productivity.
